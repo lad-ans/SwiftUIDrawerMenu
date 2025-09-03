@@ -50,13 +50,13 @@ struct ContentView: View {
                             .foregroundStyle(.white)
                             .font(.title)
                         
-                        Button("", systemImage: "xmark.circle.fill") {
+                        Button("", systemImage: "xmark") {
                             drawerToggler(drawerWidth)
                         }
                         .font(.largeTitle)
                         .foregroundStyle(.white)
-                        .frame(width: 35, height: 35)
-                        .offset(x: (drawerWidth * 0.5) - 35, y: -proxy.frame(in: .local).midY + proxy.safeAreaInsets.top)
+                        .frame(width: 30, height: 30)
+                        .offset(x: (drawerWidth * 0.5) - 35, y: -proxy.frame(in: .local).midY - 20 + proxy.safeAreaInsets.top)
                     }
                     .frame(width: drawerWidth)
                     .frame(
@@ -75,10 +75,13 @@ struct ContentView: View {
                     .onChanged { value in
                         let offsetX = value.translation.width
                         
-                        if offsetX > drawerWidth { return }
-                        if offsetX > 0 && isDrawerOpen { return }
+                        if offsetX > drawerWidth ||
+                            (offsetX > 0 && isDrawerOpen) ||
+                            (offsetX < 0 && !isDrawerOpen) {
+                            return
+                        }
                         
-                        withAnimation(.easeOut(duration: 0.25)) {
+                        withAnimation(.easeOut(duration: 0.4)) {
                             if !isDrawerOpen {
                                 offset = offsetX
                             } else {
@@ -91,7 +94,7 @@ struct ContentView: View {
                         let threshold: CGFloat = drawerWidth / 2
                         
                         withAnimation(.easeOut(duration: 0.4)) {
-                            if offsetX > threshold || offsetX > -threshold {
+                            if offsetX > threshold || (offsetX < 0 && offsetX > -threshold) {
                                 offset = drawerWidth
                                 isDrawerOpen = true
                             } else {
@@ -106,7 +109,7 @@ struct ContentView: View {
     }
     
     func drawerToggler(_ value: CGFloat) {
-        withAnimation(.easeOut(duration: 0.25)) {
+        withAnimation(.easeOut(duration: 0.4)) {
             isDrawerOpen.toggle()
             
             if isDrawerOpen {
